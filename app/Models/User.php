@@ -21,6 +21,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'avatar',
+        'cover',
+        'bio',
+        'role',
     ];
 
     /**
@@ -44,5 +48,46 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Model and relationships.
+     */
+    // a user can have multiple social accounts
+    public function socialAccounts()
+    {
+        return $this->hasMany(SocialAccount::class);
+    }
+
+    // a user can have many posts
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+
+    // a user can have many comments
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    /**
+     * Follow system
+     * A user can follow many users
+     * A user can be followed by many users
+     */
+    public function followers()
+    {
+        return $this->belongsToMany(User::class, 'follows', 'following_id', 'follower_id');
+    }
+
+    public function following()
+    {
+        return $this->belongsToMany(
+            User::class,
+            'follows',
+            'follower_id',
+            'following_id'
+        );
     }
 }
