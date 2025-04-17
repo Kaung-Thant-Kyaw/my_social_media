@@ -77,7 +77,7 @@
                             </a>
                         </div>
                         <div>
-                            <a href="{{ route('social.login.callback', 'github') }}"
+                            <a href="{{ route('social.login.redirect', 'github') }}"
                                 class="inline-flex w-full items-center justify-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition duration-150 ease-in-out hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                                 <i class="fa-brands fa-github h-5 w-5 text-gray-800"></i>
 
