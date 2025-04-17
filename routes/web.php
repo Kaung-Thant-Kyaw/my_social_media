@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Auth\SocialLoginController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -17,4 +18,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
+
+// Social Login
+Route::prefix('auth')->group(function () {
+    Route::get('/{provider}/redirect', [SocialLoginController::class, 'redirect'])->name('social.login.redirect');
+    Route::get('/{provider}/callback', [SocialLoginController::class, 'callback'])->name('social.login.callback');
+});
