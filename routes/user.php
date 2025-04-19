@@ -8,9 +8,21 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/home', [UserController::class, 'home'])->name('home');
 
     // profile
-    Route::get('/profile/{user}', [UserProfileController::class, 'show'])->name('user.profile.show');
-    Route::get('/profile/{user}/edit', [UserProfileController::class, 'edit'])->name('user.profile.edit');
-    Route::put('/profile/{user}', [UserProfileController::class, 'update'])->name('user.profile.update');
-    Route::get('/profile/{user}/edit-password', [UserProfileController::class, 'editPassword'])->name('user.profile.edit-password');
-    Route::put('/profile/{user}/update-password', [UserProfileController::class, 'updatePassword'])->name('user.profile.update-password');
+    Route::prefix('profile')->group(function () {
+        Route::get('{user}', [UserProfileController::class, 'show'])->name('user.profile.show');
+        Route::get('{user}/edit', [UserProfileController::class, 'edit'])->name('user.profile.edit');
+        Route::put('/', [UserProfileController::class, 'update'])->name('user.profile.update');
+        Route::get('{user}/edit-password', [UserProfileController::class, 'editPassword'])->name('user.profile.edit-password');
+        Route::put('{user}/update-password', [UserProfileController::class, 'updatePassword'])->name('user.profile.update-password');
+
+        // change profile picture
+        Route::post('/change-profile-picture', [UserProfileController::class, 'changeProfilePicture'])->name('user.profile.change-profile-picture');
+
+        // change cover picture
+        Route::post('/change-cover-picture', [UserProfileController::class, 'changeCoverPicture'])->name('user.profile.change-cover-picture');
+
+        // change password
+        Route::get('change-password/{user}', [UserProfileController::class, 'changePasswordPage'])->name('user.profile.change-password-page');
+        Route::post('change-password', [UserProfileController::class, 'changePassword'])->name('user.profile.change-password');
+    });
 });

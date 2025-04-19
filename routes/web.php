@@ -27,3 +27,7 @@ Route::prefix('auth')->group(function () {
     Route::get('/{provider}/callback', [SocialLoginController::class, 'callback'])->name('social.login.callback');
     Route::delete('/social-account/{socialAccount}', [SocialLoginController::class, 'destroy'])->middleware('auth')->name('social.accounts.destroy');
 });
+
+Route::get('/test', function () {
+    dd('route testing');
+});
