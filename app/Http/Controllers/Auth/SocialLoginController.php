@@ -3,42 +3,71 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Models\User;
-use Illuminate\Http\Request;
 use App\Models\SocialAccount;
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class SocialLoginController extends Controller
 {
-    // login
-    public function redirect($provider)
+    /**
+     * Redirect to provider's authentication page
+     */
+    public function redirect(string $provider): RedirectResponse
     {
-        // redirect to the provider's authentication page
         return Socialite::driver($provider)->redirect();
     }
 
-    // callback
-    public function callback($provider)
+    /**
+     * Handle provider callback
+     */
+    public function callback(string $provider): RedirectResponse
     {
+
         try {
             $socialUser = Socialite::driver($provider)->user();
 
-            // check if the user is already registered, if not create a new user
+            if (Auth::check()) {
+                return $this->linkSocialAccount(Auth::user(), $socialUser, $provider);
+            }
+
             $user = $this->findOrCreateUser($socialUser, $provider);
             Auth::login($user, true);
 
-            return redirect('/dashboard');
+            return redirect()->intended(route('home'));
         } catch (\Exception $e) {
-            return redirect('/login')->withErrors('Login Failed: ' . $e->getMessage());
+            Log::error('Social login failed: ' . $e->getMessage());
+            return redirect()->route('login')->withErrors([
+                'social' => 'Login failed. Please try another method.'
+            ]);
         }
     }
 
-    // find or create user
-    private function findOrCreateUser($socialUser, $provider)
+    /**
+     * Delete social account
+     */
+    public function destroy(SocialAccount $socialAccount): RedirectResponse
     {
-        // check if user already exists in database
+        if ($socialAccount->is_primary) {
+            return back()->withErrors([
+                'social' => 'Cannot unlink primary login method'
+            ]);
+        }
+
+        $socialAccount->delete();
+        return back()->with('status', 'Account unlinked successfully');
+    }
+
+    /**
+     * Find or create user
+     */
+    private function findOrCreateUser($socialUser, string $provider): User
+    {
+        // Check for existing social account
         $socialAccount = SocialAccount::where('provider', $provider)
             ->where('provider_id', $socialUser->getId())
             ->first();
@@ -47,27 +76,72 @@ class SocialLoginController extends Controller
             return $socialAccount->user;
         }
 
-        // create a new user
+        // Find user by email or create new
         $user = User::where('email', $socialUser->getEmail())->first();
 
         if (!$user) {
             $user = User::create([
                 'name' => $socialUser->getName() ?? $socialUser->getNickname(),
                 'email' => $socialUser->getEmail(),
-                'password' => null, // no need for social login
-                'email_verified_at' => Carbon::now(),
+                'password' => null,
+                'email_verified_at' => now(),
+                'avatar' => $this->getAvatarUrl($socialUser),
             ]);
         }
 
-
-        // create social account relationship
+        // Create social account (mark as primary if first social login)
         $user->socialAccounts()->create([
             'provider' => $provider,
             'provider_id' => $socialUser->getId(),
             'token' => $socialUser->token,
             'refresh_token' => $socialUser->refreshToken,
             'expired_at' => Carbon::now()->addSeconds($socialUser->expiresIn),
+            'is_primary' => !$user->socialAccounts()->exists(),
         ]);
+
         return $user;
+    }
+
+    /**
+     * Link additional social account
+     */
+    private function linkSocialAccount(User $user, $socialUser, string $provider): RedirectResponse
+    {
+        // Check if already linked to any user
+        $existingAccount = SocialAccount::where('provider', $provider)
+            ->where('provider_id', $socialUser->getId())
+            ->first();
+
+        if ($existingAccount) {
+            if ($existingAccount->user_id !== $user->id) {
+                return back()->withErrors([
+                    'social' => 'This account is already linked to another user'
+                ]);
+            }
+            return redirect()->back()->with('info', 'Account already linked');
+        }
+
+        $user->socialAccounts()->create([
+            'provider' => $provider,
+            'provider_id' => $socialUser->getId(),
+            'token' => $socialUser->token,
+            'refresh_token' => $socialUser->refreshToken,
+            'expired_at' => Carbon::now()->addSeconds($socialUser->expiresIn),
+            'is_primary' => false,
+        ]);
+
+        return redirect()->back()->with('status', 'Account linked successfully');
+    }
+
+    /**
+     * Get avatar URL from social provider
+     */
+    private function getAvatarUrl($socialUser): ?string
+    {
+        try {
+            return $socialUser->getAvatar() ?: null;
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 }

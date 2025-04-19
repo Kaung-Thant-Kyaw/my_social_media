@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('provider_id');
             $table->text('token')->nullable();
             $table->text('refresh_token')->nullable();
+            $table->boolean('is_primary')->default(false);
             $table->timestamp('expired_at')->nullable();
             $table->timestamps();
 

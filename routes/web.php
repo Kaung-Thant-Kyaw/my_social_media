@@ -21,8 +21,9 @@ Route::middleware('auth')->group(function () {
 });
 
 
-// Social Login
+// Social Accounts
 Route::prefix('auth')->group(function () {
     Route::get('/{provider}/redirect', [SocialLoginController::class, 'redirect'])->name('social.login.redirect');
     Route::get('/{provider}/callback', [SocialLoginController::class, 'callback'])->name('social.login.callback');
+    Route::delete('/social-account/{socialAccount}', [SocialLoginController::class, 'destroy'])->middleware('auth')->name('social.accounts.destroy');
 });
