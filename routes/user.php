@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\User\PostController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\UserProfileController;
@@ -24,5 +25,11 @@ Route::middleware(['auth'])->group(function () {
         // change password
         Route::get('change-password/{user}', [UserProfileController::class, 'changePasswordPage'])->name('user.profile.change-password-page');
         Route::post('change-password', [UserProfileController::class, 'changePassword'])->name('user.profile.change-password');
+    });
+
+    // posts 
+    Route::prefix('post')->group(function () {
+        Route::get('/create', [PostController::class, 'create'])->name('post.create');
+        Route::post('', [PostController::class, 'store'])->name('post.store');
     });
 });

@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('post_media', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('post_id')->constrained()->cascadeOnDelete();
             $table->string('file_path');
+            $table->integer('order')->default(0);
             $table->timestamps();
         });
     }

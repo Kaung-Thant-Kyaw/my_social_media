@@ -19,7 +19,7 @@
                         @endif
                         @if (auth()->id() === $user->id)
                             <div class="absolute right-2 top-2 rounded bg-white/70 px-3 py-1 text-sm shadow">
-                                Change Cover
+                                {{ $user->cover ? 'Change' : 'Upload' }} Cover
                             </div>
                         @endif
                     </div>
@@ -35,11 +35,19 @@
                     <form id="avatar-form" action="{{ route('user.profile.change-profile-picture') }}" method="POST"
                         enctype="multipart/form-data">
                         @csrf
-                        <label for="avatar-input">
-                            <img class="h-32 w-32 cursor-pointer rounded-full border-4 border-white shadow-lg"
+                        <label for="avatar-input" class="group relative inline-block">
+                            <img class="h-32 w-32 cursor-pointer rounded-full border-4 border-white object-cover shadow-lg"
                                 src="{{ $user->avatar ? asset('profile_pictures/' . $user->avatar) : asset('images/default-avatar.jpg') }}"
                                 alt="{{ $user->name }}">
+
+                            {{-- Hover overlay --}}
+                            <div
+                                class="absolute inset-0 flex items-center justify-center rounded-full bg-gray-500 bg-opacity-50 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                                <span class="text-sm font-semibold text-white">{{ $user->avatar ? 'Change' : 'Upload' }}
+                                    Profile</span>
+                            </div>
                         </label>
+
                         <input id="avatar-input" name="avatar" type="file" class="hidden"
                             onchange="document.getElementById('avatar-form').submit()">
                     </form>
@@ -116,5 +124,14 @@
                 </div>
             @endif
         </div>
-    </div>
-@endsection
+        {{-- POST CREATION FORM --}}
+        @if (auth()->id() === $user->id)
+            <div class="mt-4">
+                <a href="{{ route('post.create') }}">
+                    <textarea readonly class="w-full cursor-pointer rounded-md border p-3 text-sm text-gray-500" rows="1"
+                        placeholder="What's on your mind?"></textarea>
+                </a>
+            </div>
+        @endif
+
+    @endsection

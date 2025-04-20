@@ -28,6 +28,6 @@ Route::prefix('auth')->group(function () {
     Route::delete('/social-account/{socialAccount}', [SocialLoginController::class, 'destroy'])->middleware('auth')->name('social.accounts.destroy');
 });
 
-Route::get('/test', function () {
-    dd('route testing');
-});
+Route::post('/test-posts', function() {
+    return response()->json(['status' => 'success']);
+})->name('test-posts');
