@@ -43,9 +43,9 @@
                         <label for="visibility" class="block text-sm font-medium text-gray-700">Post Visibility</label>
                         <select name="visibility" id="visibility"
                             class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                            <option value="public">🌍 Public</option>
-                            <option value="friend">👥 Friends</option>
-                            <option value="private">🔒 Private</option>
+                            <option value="public" @selected(old('visibility') == 'public')>🌍 Public</option>
+                            <option value="friend" @selected(old('visibility') == 'friend')>👥 Friends</option>
+                            <option value="private" @selected(old('visibility') == 'private')>🔒 Private</option>
                         </select>
                         @error('visibility')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -73,37 +73,42 @@
         document.addEventListener('DOMContentLoaded', function() {
             const input = document.getElementById('images');
             const preview = document.getElementById('image-preview');
-            let uploadedFiles = []; // ရွေးထားတဲ့ဖိုင်တွေကို စီမံဖို့ array
+            let uploadedFiles = [];
 
-            // 1. ဖိုင်ရွေးလိုက်တိုင်း Preview ပြခြင်း
+            // File input change handler
             input.addEventListener('change', function() {
-                uploadedFiles = Array.from(this.files); // ဖိုင်တွေကို array အဖြစ်သိမ်း
-                preview.innerHTML = '';
+                uploadedFiles = Array.from(this.files);
+                updatePreview();
+            });
+
+            // Preview update function
+            function updatePreview() {
+                preview.innerHTML = ''; // Clear existing previews
 
                 uploadedFiles.forEach((file, index) => {
-                    if (!file.type.startsWith('image/')) return;
-
                     const reader = new FileReader();
+
                     reader.onload = (e) => {
                         const img = document.createElement('img');
                         img.src = e.target.result;
-                        img.className =
-                            'size-40 rounded object-cover border cursor-move draggable';
-                        img.draggable = true; // Drag လုပ်လို့ရအောင်
-                        img.dataset.index = index; // မူလအစီအစဥ်ကို သိမ်းထား
+                        img.className = 'size-40 object-cover rounded border border-gray-300';
+                        img.draggable = true;
+                        img.dataset.index = index;
 
-                        // Drag & Drop Event Listeners
+                        // Drag & Drop handlers
                         img.addEventListener('dragstart', handleDragStart);
                         img.addEventListener('dragover', handleDragOver);
                         img.addEventListener('drop', handleDrop);
+                        img.addEventListener('dragend', handleDragEnd);
 
                         preview.appendChild(img);
                     };
+
                     reader.readAsDataURL(file);
                 });
-            });
+            }
 
-            // 2. Drag & Drop Logic
+            // Drag & Drop functions
             let draggedIndex = null;
 
             function handleDragStart(e) {
@@ -112,43 +117,40 @@
             }
 
             function handleDragOver(e) {
-                e.preventDefault();
+                e.preventDefault(); // Required for drop to work
                 e.dataTransfer.dropEffect = 'move';
             }
 
             function handleDrop(e) {
                 e.preventDefault();
                 const targetIndex = parseInt(e.target.dataset.index);
-                swapImages(draggedIndex, targetIndex); // ပုံတွေကို နေရာပြောင်း
-                updateFileInputOrder(); // File Input ကို update လုပ်
+                swapImages(draggedIndex, targetIndex);
+                updatePreview();
+                updateFileInput();
             }
 
-            // 3. ပုံတွေရဲ့ နေရာပြောင်းလဲမှု
+            function handleDragEnd() {
+                draggedIndex = null;
+            }
+
+            // Swap images in array
             function swapImages(oldIndex, newIndex) {
-                // ပုံတွေကို array ထဲမှာ ပြန်စီ
                 [uploadedFiles[oldIndex], uploadedFiles[newIndex]] = [uploadedFiles[newIndex], uploadedFiles[
                     oldIndex]];
-
-                // Preview ကို update လုပ်
-                preview.innerHTML = '';
-                uploadedFiles.forEach((file, index) => {
-                    const img = document.createElement('img');
-                    img.src = URL.createObjectURL(file);
-                    img.className = 'size-40 rounded object-cover border cursor-move';
-                    img.draggable = true;
-                    img.dataset.index = index;
-                    img.addEventListener('dragstart', handleDragStart);
-                    img.addEventListener('dragover', handleDragOver);
-                    img.addEventListener('drop', handleDrop);
-                    preview.appendChild(img);
-                });
             }
 
-            // 4. Form Submit မှာ File Order ကို update လုပ်
-            document.querySelector('form').addEventListener('submit', function(e) {
+            // Update actual file input
+            function updateFileInput() {
                 const dataTransfer = new DataTransfer();
                 uploadedFiles.forEach(file => dataTransfer.items.add(file));
-                input.files = dataTransfer.files; // အသစ်စီထားတဲ့ဖိုင်တွေကို ထည့်
+                input.files = dataTransfer.files;
+                console.log('Updated Files', input.files.length);
+            }
+
+            // Ensure file input updates before form submit
+            document.querySelector('form').addEventListener('submit', function(e) {
+                console.log('Final files:', document.getElementById('images').files);
+                updateFileInput();
             });
         });
     </script>

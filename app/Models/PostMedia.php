@@ -9,6 +9,7 @@ class PostMedia extends Model
     protected $fillable = [
         'user_id',
         'file_path',
+        'order',
     ];
 
     // post media belongs to a post

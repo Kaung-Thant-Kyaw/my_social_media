@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('post_id')->constrained()->cascadeOnDelete();
             $table->string('file_path');
-            $table->integer('order')->default(0);
+            $table->integer('order')->nullable(false);
             $table->timestamps();
         });
     }

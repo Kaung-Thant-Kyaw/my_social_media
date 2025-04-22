@@ -134,4 +134,106 @@
             </div>
         @endif
 
-    @endsection
+        {{-- User Posts --}}
+        <div class="mt-4">
+            @if (count($user->posts) < 0)
+                <p class="text-center text-gray-500">No post yet.</p>
+            @else
+                <div class="mt-6 space-y-4">
+                    @forelse($posts as $post)
+                        <div class="rounded-lg bg-white p-4 shadow">
+                            {{-- Post Header --}}
+                            <div class="mb-3 flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <img src="{{ $post->user->avatar ? asset('profile_pictures/' . $post->user->avatar) : asset('images/default-avatar.jpg') }}"
+                                        class="mr-3 h-10 w-10 rounded-full">
+                                    <div>
+                                        <p class="font-semibold">{{ $post->user->name }}</p>
+                                        <p class="text-xs text-gray-500">
+                                            {{ $post->created_at->diffForHumans() }}
+                                            • {{ ucfirst($post->visibility) }}
+                                        </p>
+                                    </div>
+                                </div>
+                                @if (auth()->id() === $post->user_id)
+                                    <div class="dropdown">
+                                        <button class="text-gray-400 hover:text-gray-600">
+                                            <i class="fas fa-ellipsis-h"></i>
+                                        </button>
+                                        {{-- Dropdown menu for edit/delete --}}
+                                        <div class="dropdown-content">
+                                            <a href="{{ route('post.edit', $post) }}"
+                                                class="text-sm text-blue-500">Edit</a>
+                                            <form action="{{ route('post.destroy', $post) }}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="text-sm text-red-500">Delete</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+
+                            {{-- Post Content --}}
+                            @if ($post->content)
+                                <p class="mb-4 text-gray-800">{{ $post->content }}</p>
+                            @endif
+
+                            {{-- Post Images --}}
+                            @if ($post->media->count() > 0)
+                                <div class="grid grid-cols-2 gap-2 md:grid-cols-3">
+                                    @foreach ($post->media as $media)
+                                        <img src="{{ asset('posts/' . $media->file_path) }}" alt="Post image"
+                                            class="h-40 w-full rounded object-cover">
+                                    @endforeach
+                                </div>
+                            @endif
+
+                            {{-- Post Actions --}}
+                            <div class="mt-4 flex items-center gap-4 border-t pt-3">
+                                <button class="flex items-center gap-1 text-gray-500 hover:text-blue-500">
+                                    <i class="far fa-heart"></i>
+                                    <span>Heart</span>
+                                </button>
+                                <button class="flex items-center gap-1 text-gray-500 hover:text-green-500">
+                                    <i class="far fa-comment"></i>
+                                    <span>Comment</span>
+                                </button>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="rounded-lg bg-white p-4 text-center text-gray-500 shadow">
+                            No posts found
+                        </div>
+                    @endforelse
+                </div>
+        </div>
+        @endif
+    </div>
+
+@endsection
+@push('styles')
+    <style>
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+            padding: 0.5rem;
+            z-index: 1;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+    </style>
+@endpush

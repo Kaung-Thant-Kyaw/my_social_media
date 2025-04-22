@@ -12,8 +12,9 @@
             crossorigin="anonymous" referrerpolicy="no-referrer" />
     </head>
 
-    <body>
+    <body class="bg-gray-100">
         @yield('content')
+        @stack('styles')
         @stack('scripts')
     </body>
 
