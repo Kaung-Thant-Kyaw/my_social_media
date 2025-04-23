@@ -37,7 +37,7 @@
                         @csrf
                         <label for="avatar-input" class="group relative inline-block">
                             <img class="h-32 w-32 cursor-pointer rounded-full border-4 border-white object-cover shadow-lg"
-                                src="{{ $user->avatar ? asset('profile_pictures/' . $user->avatar) : asset('images/default-avatar.jpg') }}"
+                                src="{{ $user->avatar ? asset('profile_pictures/' . $user->avatar) : asset('default_user.jpg') }}"
                                 alt="{{ $user->name }}">
 
                             {{-- Hover overlay --}}
@@ -80,8 +80,11 @@
 
             {{-- STATUS MESSAGE --}}
             @if (session('status'))
-                <div class="px-6 pb-4 text-sm text-green-600">
+                <div class="px-6 pb-4 text-sm text-green-600" id="session-message">
                     {{ session('status') }}
+                    <button onclick="document.getElementById('session-message').style.display='none'">
+                        <i class="fa-solid fa-xmark text-red-600"></i>
+                    </button>
                 </div>
             @endif
 
@@ -126,10 +129,11 @@
         </div>
         {{-- POST CREATION FORM --}}
         @if (auth()->id() === $user->id)
-            <div class="mt-4">
-                <a href="{{ route('post.create') }}">
-                    <textarea readonly class="w-full cursor-pointer rounded-md border p-3 text-sm text-gray-500" rows="1"
-                        placeholder="What's on your mind?"></textarea>
+            <div class="mt-4 flex-1">
+                <a href="{{ route('post.create') }}" class="block w-full">
+                    <input type="text" placeholder="What's on your mind?"
+                        class="w-full cursor-pointer rounded-full bg-gray-100 px-4 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        readonly>
                 </a>
             </div>
         @endif
@@ -143,9 +147,9 @@
                     @forelse($posts as $post)
                         <div class="rounded-lg bg-white p-4 shadow">
                             {{-- Post Header --}}
-                            <div class="mb-3 flex items-center justify-between">
+                            <div class="mb-3 flex items-center space-x-3">
                                 <div class="flex items-center">
-                                    <img src="{{ $post->user->avatar ? asset('profile_pictures/' . $post->user->avatar) : asset('images/default-avatar.jpg') }}"
+                                    <img src="{{ $post->user->avatar ? asset('profile_pictures/' . $post->user->avatar) : asset('default_user.jpg') }}"
                                         class="mr-3 h-10 w-10 rounded-full">
                                     <div>
                                         <p class="font-semibold">{{ $post->user->name }}</p>

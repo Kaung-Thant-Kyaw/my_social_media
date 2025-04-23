@@ -4,7 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -73,16 +73,27 @@ class User extends Authenticatable
     }
 
     /**
-     * Follow system
-     * A user can follow many users
-     * A user can be followed by many users
+     * Check the current user is following the given user
      */
-    public function followers()
+    public function isFollowing(User $user): bool
+    {
+        return $this->following()
+            ->where('following_id', $user->id)
+            ->exists();
+    }
+
+    /**
+     * Relationship: users that follow this user
+     */
+    public function followers(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'follows', 'following_id', 'follower_id');
     }
 
-    public function following()
+    /**
+     * Relationship: users that this user follows
+     */
+    public function following(): BelongsToMany
     {
         return $this->belongsToMany(
             User::class,

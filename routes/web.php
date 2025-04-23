@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\SocialLoginController;
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
 require __DIR__ . '/admin.php';
@@ -28,6 +29,9 @@ Route::prefix('auth')->group(function () {
     Route::delete('/social-account/{socialAccount}', [SocialLoginController::class, 'destroy'])->middleware('auth')->name('social.accounts.destroy');
 });
 
-Route::post('/test-posts', function() {
-    return response()->json(['status' => 'success']);
-})->name('test-posts');
+// Route::post('/test-posts', function() {
+//     return response()->json(['status' => 'success']);
+// })->name('test-posts');
+
+// Home
+Route::get('home', [HomeController::class, 'index'])->middleware(['auth'])->name('home');

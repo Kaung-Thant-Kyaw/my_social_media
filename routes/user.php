@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\User\FollowController;
 use App\Http\Controllers\User\PostController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\User\UserController;
@@ -27,12 +28,18 @@ Route::middleware(['auth'])->group(function () {
         Route::post('change-password', [UserProfileController::class, 'changePassword'])->name('user.profile.change-password');
     });
 
-    // posts 
+    // posts
     Route::prefix('post')->group(function () {
         Route::get('/create', [PostController::class, 'create'])->name('post.create');
         Route::post('', [PostController::class, 'store'])->name('post.store');
         Route::get('{post}', [PostController::class, 'edit'])->name('post.edit');
         Route::put('{post}', [PostController::class, 'update'])->name('post.update');
         Route::delete('{post}', [PostController::class, 'destroy'])->name('post.destroy');
+    });
+
+    // follow | unfollow
+    Route::prefix('users')->group(function () {
+        Route::post('{user}/follow', [FollowController::class, 'follow'])->name('user.follow');
+        Route::post('{user}/unfollow', [FollowController::class, 'unfollow'])->name('user.unfollow');
     });
 });
