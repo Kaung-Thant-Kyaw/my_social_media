@@ -1,9 +1,10 @@
 <?php
 
-use App\Http\Controllers\User\FollowController;
-use App\Http\Controllers\User\PostController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ReactionController;
+use App\Http\Controllers\User\PostController;
 use App\Http\Controllers\User\UserController;
+use App\Http\Controllers\User\FollowController;
 use App\Http\Controllers\UserProfileController;
 
 Route::middleware(['auth'])->group(function () {
@@ -43,4 +44,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('{user}/follow', [FollowController::class, 'follow'])->name('user.follow');
         Route::post('{user}/unfollow', [FollowController::class, 'unfollow'])->name('user.unfollow');
     });
+
+    // reaction
+    Route::post('reactions/toggle', [ReactionController::class, 'toggle'])->name('reactions.toggle');
 });

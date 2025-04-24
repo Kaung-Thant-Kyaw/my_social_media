@@ -69,14 +69,7 @@
     {{-- Post Actions --}}
     <div class="flex space-x-3 border-y border-gray-100 py-2 text-gray-500">
         {{-- Like Button --}}
-        <form action="#" method="POST">
-            @csrf
-            <button type="submit"
-                class="flex items-center gap-2 rounded-lg px-3 py-2 transition-colors hover:bg-gray-50 hover:text-red-500">
-                <i class="far fa-heart"></i>
-                <span class="text-sm"> Likes</span>
-            </button>
-        </form>
+        @include('partials.react-button', ['post' => $post])
 
         {{-- Comment Button --}}
         <button

@@ -16,6 +16,10 @@ class Post extends Model
         'visibility' => 'string',
     ];
 
+    protected $appends = [
+        'reaction_count',
+    ];
+
     // visibility query scope for home page
     // this scope will be used to filter posts based on visibility
     public function scopeVisibility($query)
@@ -43,6 +47,13 @@ class Post extends Model
         return $query->where('visibility', 'public');
     }
 
+    // post is liked by auth user
+    public function isLikedByAuthUser()
+    {
+        return auth()->check() && $this->reactions()
+            ->where('user_id', auth()->id())->exists();
+    }
+
 
     // relationships
 
@@ -68,5 +79,11 @@ class Post extends Model
     public function reactions()
     {
         return $this->morphMany(Reaction::class, 'reactable');
+    }
+
+    // get the reaction count attribute
+    public function getReactionsCountAttribute()
+    {
+        return $this->reactions()->count();
     }
 }
