@@ -44,7 +44,6 @@
                         <select name="visibility" id="visibility"
                             class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                             <option value="public" @selected(old('visibility') == 'public')>🌍 Public</option>
-                            <option value="friend" @selected(old('visibility') == 'friend')>👥 Friends</option>
                             <option value="private" @selected(old('visibility') == 'private')>🔒 Private</option>
                         </select>
                         @error('visibility')

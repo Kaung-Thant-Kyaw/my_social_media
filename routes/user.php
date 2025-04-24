@@ -30,6 +30,7 @@ Route::middleware(['auth'])->group(function () {
 
     // posts
     Route::prefix('post')->group(function () {
+        Route::get('{post}', [PostController::class, 'show'])->name('post.show');
         Route::get('/create', [PostController::class, 'create'])->name('post.create');
         Route::post('', [PostController::class, 'store'])->name('post.store');
         Route::get('{post}', [PostController::class, 'edit'])->name('post.edit');

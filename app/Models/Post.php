@@ -16,6 +16,33 @@ class Post extends Model
         'visibility' => 'string',
     ];
 
+    // visibility query scope for home page
+    // this scope will be used to filter posts based on visibility
+    public function scopeVisibility($query)
+    {
+        $user = auth()->user();
+
+        return $query->where(function ($query) use ($user) {
+            $query->where('visibility', 'public')
+                ->orWhere(function ($query) use ($user) {
+                    $query->where('visibility', 'private')
+                        ->where('user_id', $user->id);
+                });
+        });
+    }
+
+    // scope filter for profile page
+    public function scopeUserProfile($query, User $profileUser)
+    {
+        $viewer = auth()->user();
+        // if the viewer is the profile owner, show all posts
+        if ($viewer && $viewer->is($profileUser)) {
+            return $query;
+        }
+        // if the viewer isn't the profile owner, show only public posts
+        return $query->where('visibility', 'public');
+    }
+
 
     // relationships
 

@@ -12,7 +12,7 @@ class Reaction extends Model
         'reactable_type',
     ];
 
-    public function reactable()
+    public function reactable(): MorphTo
     {
         return $this->morphTo();
     }

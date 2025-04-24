@@ -11,12 +11,16 @@ class HomeController extends Controller
     public function index()
     {
         // get posts from users the current user follows & own posts
-        $posts = Post::whereIn('user_id', function ($query) {
-            $query->select('following_id')
-                ->from('follows')
-                ->where('follower_id', auth()->id());
-        })
-            ->orWhere('user_id', auth()->user()->id)
+        $posts = Post::Visibility()
+            ->where(function ($query) {
+                // get posts from user the current user follows
+                $query->whereIn('user_id', function ($query) {
+                    $query->select('following_id')
+                        ->from('follows')
+                        ->where('follower_id', auth()->user()->id);
+                })
+                    ->orWhere('user_id', auth()->user()->id);
+            })
             ->with('user')
             ->latest()
             ->paginate(10);

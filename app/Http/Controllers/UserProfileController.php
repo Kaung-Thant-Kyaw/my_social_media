@@ -15,7 +15,7 @@ class UserProfileController extends Controller
     public function show($user)
     {
         $user = User::findOrFail($user);
-        $posts = $user->posts()->latest()->get();
+        $posts = $user->posts()->UserProfile($user)->latest()->get();
         return view('user.profile.show', compact('user', 'posts'));
     }
 

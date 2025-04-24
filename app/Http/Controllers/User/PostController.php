@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
+    // show post
+    public function show(Post $post) {}
+
     // create form
     public function create()
     {

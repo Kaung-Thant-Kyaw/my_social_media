@@ -53,7 +53,6 @@
                         <label class="mb-2 block text-sm font-medium">Visibility</label>
                         <select name="visibility" class="w-full rounded-md border px-3 py-2">
                             <option value="public" @selected(old('visibility', $post->visibility) == 'public')>Public</option>
-                            <option value="friend" @selected(old('visibility', $post->visibility) == 'friend')>Friends</option>
                             <option value="private" @selected(old('visibility', $post->visibility) == 'private')>Private</option>
                         </select>
                     </div>
